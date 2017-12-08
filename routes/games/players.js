@@ -17,19 +17,9 @@ const loadGame = (req, res, next) => {
 }
 
 const getPlayers = (req, res, next) => {
-  Promise.all(req.game.players.map(player => User.findById(player.userId)))
+  Promise.all(req.game.players.map(player => User.findById(player)))
     .then((users) => {
-      // Combine player data and user's name
-      req.players = req.game.players.map((player) => {
-        const { name } = users
-          .filter((u) => u._id.toString() === player.userId.toString())[0]
-
-        return {
-          userId: player.userId,
-          pairs: player.pairs,
-          name
-        }
-      })
+      req.players = users
       next()
     })
     .catch((error) => next(error))
@@ -47,14 +37,14 @@ module.exports = io => {
 
       const userId = req.account._id
 
-      if (req.game.players.filter((p) => p.userId.toString() === userId.toString()).length > 0) {
-        const error = Error.new('You already joined this game!')
+      if (req.game.players.filter((p) => p.toString() === userId.toString()).length > 0) {
+        const error = new Error('You already joined this game!')
         error.status = 401
         return next(error)
       }
 
       // Add the user to the players
-      req.game.players.push({ userId, pairs: [] })
+      req.game.players.push(userId)
 
       req.game.save()
         .then((game) => {
@@ -81,15 +71,15 @@ module.exports = io => {
       if (!req.game) { return next() }
 
       const userId = req.account._id
-      const currentPlayer = req.game.players.filter((p) => p.userId.toString() === userId.toString())[0]
+      const currentPlayer = req.game.players.filter((p) => p.toString() === userId.toString())[0]
 
       if (!currentPlayer) {
-        const error = Error.new('You are not a player of this game!')
+        const error = new Error('You are not a player of this game!')
         error.status = 401
         return next(error)
       }
 
-      req.game.players = req.game.players.filter((p) => p.userId.toString() !== userId.toString())
+      req.game.players = req.game.players.filter((p) => p.toString() !== userId.toString())
       req.game.save()
         .then((game) => {
           req.game = game
