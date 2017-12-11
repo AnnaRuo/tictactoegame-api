@@ -65,17 +65,20 @@ module.exports = io => {
         })
         .catch((error) => next(error))
     })
-    .patch('/games/:id', authenticate, (req, res, next) => {
+
+    .patch('/games/play/:id', authenticate, (req, res, next) => {
       const id = req.params.id
 
-      const patchForGame = Object.assign({},)
+
 
 
       Game.findById(id)
         .then((game) => {
           if (!game) { return next() }
+          const newTicTacToe = game.tictactoe;
+          newTicTacToe[req.body.index] = "<3";
 
-          const updatedGame = { ...game, ...patchForGame }
+          const updatedGame = { ...game, tictactoe: newTicTacToe }
 
           Game.findByIdAndUpdate(id, { $set: updatedGame }, { new: true })
             .then((game) => {
