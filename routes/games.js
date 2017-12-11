@@ -30,13 +30,16 @@ module.exports = io => {
     .post('/games', authenticate, (req, res, next) => {
       const newGame = {
         userId: req.account._id,
-        players: [req.account._id],
-        tiles: [
+        players: [{
+          userId: req.account._id}],
+
+        tictactoe: [
           null, null, null,
           null, null, null,
           null, null, null
         ]
       }
+      console.log('TICCCCCCCCCCC ' + game.tictactoe)
 
       Game.create(newGame)
         .then((game) => {
@@ -44,6 +47,8 @@ module.exports = io => {
             type: 'GAME_CREATED',
             payload: game
           })
+
+
           res.json(game)
         })
         .catch((error) => next(error))
@@ -64,7 +69,9 @@ module.exports = io => {
     })
     .patch('/games/:id', authenticate, (req, res, next) => {
       const id = req.params.id
-      const patchForGame = req.body
+
+      const patchForGame = Object.assign({},)
+
 
       Game.findById(id)
         .then((game) => {

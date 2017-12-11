@@ -4,6 +4,7 @@ const { Schema } = mongoose
 
 const gameSchema = new Schema({
   tiles: [String],
+  tictactoe: [String],
   players: [{ type: Schema.Types.ObjectId, ref: 'users' }],
   turn: { type: Number, default: 0 }, // player index
   started: { type: Boolean, default: false },
