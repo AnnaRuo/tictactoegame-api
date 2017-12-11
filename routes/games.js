@@ -30,8 +30,7 @@ module.exports = io => {
     .post('/games', authenticate, (req, res, next) => {
       const newGame = {
         userId: req.account._id,
-        players: [{
-          userId: req.account._id}],
+        players: [req.account],
 
         tictactoe: [
           null, null, null,
@@ -39,7 +38,6 @@ module.exports = io => {
           null, null, null
         ]
       }
-      console.log('TICCCCCCCCCCC ' + game.tictactoe)
 
       Game.create(newGame)
         .then((game) => {
